@@ -10,9 +10,9 @@ from django.utils.module_loading import import_string
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
-import requests
-from registration.forms import ResendActivationForm
-
+import requests         
+from registration.forms import ResendActivationForm      
+from accounts.models import  Account, Profile
 REGISTRATION_FORM_PATH = getattr(settings, 'REGISTRATION_FORM',
                                  'registration.forms.RegistrationForm')
 REGISTRATION_FORM = import_string(REGISTRATION_FORM_PATH)
