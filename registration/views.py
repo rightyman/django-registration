@@ -33,6 +33,7 @@ class RegistrationView(FormView):
 
     @method_decorator(sensitive_post_parameters('password1', 'password2'))
     def dispatch(self, request, *args, **kwargs):
+		
         """
         Check that user signup is allowed and if user is logged in before even bothering to
         dispatch or do other processing.
@@ -51,7 +52,29 @@ class RegistrationView(FormView):
         if not self.registration_allowed():
             return redirect(self.disallowed_url)
         return super(RegistrationView, self).dispatch(request, *args, **kwargs)
-
+        """
+		   Check that user is in desired geolocation before doing anything else
+		"""
+    def location(self):		
+		try:       
+            x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+            if x_forwarded_for:
+                ip = x_forwarded_for.split(',')[0]
+            else:
+                ip = request.META.get('REMOTE_ADDR') 
+            access_key = '3216e5e8d994616927c209eed6b8d62a'        
+            response = requests.get('http://api.ipstack.com/' + ip + '?access_key=' + access_key)
+            #response = requests.get('https://api.ipgeolocationapi.com/geolocate')
+            geodata = response.json() 
+            continent = geodata['continent_name']  
+            if continent != 'Africa':
+				return redirect('accounts:unavailable')   
+                 
+        except:
+            pass
+        
+        return True                                                                      
+		
     def form_valid(self, form):
         new_user = self.register(form)
         success_url = self.get_success_url(new_user)
