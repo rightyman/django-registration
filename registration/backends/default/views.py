@@ -7,6 +7,7 @@ from ...models import RegistrationProfile
 from ...users import UserModel
 from ...views import ActivationView as BaseActivationView
 from ...views import RegistrationView as BaseRegistrationView
+from accounts.models import Profile, Account  
 from ...views import ResendActivationView as BaseResendActivationView
 
 
@@ -60,7 +61,7 @@ class RegistrationView(BaseRegistrationView):
     success_url = 'registration_complete'
 
     registration_profile = RegistrationProfile
-
+    
     def register(self, form):
         """
         Given a username, email address and password, register a new
@@ -84,9 +85,9 @@ class RegistrationView(BaseRegistrationView):
         the new ``User`` as the keyword argument ``user`` and the
         class of this backend as the sender.
 
-        """
+        """                                                                     
         site = get_current_site(self.request)
-
+        
         if hasattr(form, 'save'):
             new_user_instance = form.save(commit=False)
         else:
@@ -97,8 +98,12 @@ class RegistrationView(BaseRegistrationView):
             new_user=new_user_instance,
             site=site,
             send_email=self.SEND_ACTIVATION_EMAIL,
-            request=self.request,
+            request=self.request,           
         )
+        #create the user profile#     
+        Profile.objects.create(user=new_user)                                     
+        #user to immediatley follow themselves upon signup                                               
+        Account.objects.get_or_create(user_from=new_user, user_to=new_user) 
         signals.user_registered.send(sender=self.__class__,
                                      user=new_user,
                                      request=self.request)
