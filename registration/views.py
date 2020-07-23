@@ -54,7 +54,7 @@ class RegistrationView(FormView):
         return super(RegistrationView, self).dispatch(request, *args, **kwargs)
         """
 		   Check that user is in desired geolocation before doing anything else
-		"""
+		
     def location(self, request):
 		continent = ''                      		
         try:       
@@ -75,7 +75,7 @@ class RegistrationView(FormView):
         if continent != 'Africa':     
 	        return redirect('accounts:unavailable') 
                                                                                           
-		
+	"""      
     def form_valid(self, form):
         new_user = self.register(form)
         success_url = self.get_success_url(new_user)
