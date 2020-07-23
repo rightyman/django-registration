@@ -55,7 +55,7 @@ class RegistrationView(FormView):
         """
 		   Check that user is in desired geolocation before doing anything else
 		"""
-    def location(self):		
+    def location(self, request):                      		
         try:       
             x_forwarded_for = self.request.META.get('HTTP_X_FORWARDED_FOR')
             if x_forwarded_for:
