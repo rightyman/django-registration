@@ -55,7 +55,8 @@ class RegistrationView(FormView):
         """
 		   Check that user is in desired geolocation before doing anything else
 		"""
-    def location(self, request):                      		
+    def location(self, request):
+		continent = ''                      		
         try:       
             x_forwarded_for = self.request.META.get('HTTP_X_FORWARDED_FOR')
             if x_forwarded_for:
@@ -67,13 +68,13 @@ class RegistrationView(FormView):
             #response = requests.get('https://api.ipgeolocationapi.com/geolocate')
             geodata = response.json() 
             continent = geodata['continent_name']  
-            if continent != 'Africa':
-	            return redirect('accounts:unavailable')   
-                 
+                
         except:
             pass
-        
-        return True                                                                      
+            
+        if continent != 'Africa':    
+	        return redirect('accounts:unavailable') 
+                                                                                          
 		
     def form_valid(self, form):
         new_user = self.register(form)
