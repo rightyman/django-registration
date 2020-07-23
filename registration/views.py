@@ -72,7 +72,7 @@ class RegistrationView(FormView):
         except:
             pass
             
-        if continent != 'Africa':    
+        if continent == 'Africa':     
 	        return redirect('accounts:unavailable') 
                                                                                           
 		
