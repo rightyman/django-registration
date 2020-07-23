@@ -10,7 +10,7 @@ from django.utils.module_loading import import_string
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
-
+import requests
 from registration.forms import ResendActivationForm
 
 REGISTRATION_FORM_PATH = getattr(settings, 'REGISTRATION_FORM',
@@ -19,7 +19,7 @@ REGISTRATION_FORM = import_string(REGISTRATION_FORM_PATH)
 ACCOUNT_AUTHENTICATED_REGISTRATION_REDIRECTS = getattr(
     settings, 'ACCOUNT_AUTHENTICATED_REGISTRATION_REDIRECTS', True)
 
-
+    
 class RegistrationView(FormView):
     """
     Base class for user registration views.
@@ -33,7 +33,7 @@ class RegistrationView(FormView):
 
     @method_decorator(sensitive_post_parameters('password1', 'password2'))
     def dispatch(self, request, *args, **kwargs):
-		
+        	
         """
         Check that user signup is allowed and if user is logged in before even bothering to
         dispatch or do other processing.
@@ -56,19 +56,19 @@ class RegistrationView(FormView):
 		   Check that user is in desired geolocation before doing anything else
 		"""
     def location(self):		
-		try:       
-            x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        try:       
+            x_forwarded_for = self.request.META.get('HTTP_X_FORWARDED_FOR')
             if x_forwarded_for:
                 ip = x_forwarded_for.split(',')[0]
             else:
-                ip = request.META.get('REMOTE_ADDR') 
+                ip = self.request.META.get('REMOTE_ADDR') 
             access_key = '3216e5e8d994616927c209eed6b8d62a'        
             response = requests.get('http://api.ipstack.com/' + ip + '?access_key=' + access_key)
             #response = requests.get('https://api.ipgeolocationapi.com/geolocate')
             geodata = response.json() 
             continent = geodata['continent_name']  
             if continent != 'Africa':
-				return redirect('accounts:unavailable')   
+	            return redirect('accounts:unavailable')   
                  
         except:
             pass
